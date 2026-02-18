@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  exporter="Codex"
+  exporterVersion="1.0"
+  id="Definitions_Obzhalovanie_241"
+  targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <bpmn:process id="Process_Obzhalovanie_241" name="2.4.1–2.4.2 Обжалование бездействия / отказа" isExecutable="false">
+    <bpmn:startEvent id="StartEvent_1" name="Основание для обжалования"/>
+
+    <bpmn:exclusiveGateway id="Gateway_Type" name="Что произошло?"/>
+
+    <bpmn:task id="Task_1_1" name="Подать жалобу старшему судебному приставу (7 дней после истечения срока вынесения постановления СПИ)"/>
+    <bpmn:task id="Task_Wait_1" name="Ожидать рассмотрение жалобы старшим приставом"/>
+    <bpmn:exclusiveGateway id="Gateway_Decision_1" name="Есть решение по жалобе?"/>
+
+    <bpmn:task id="Task_2_1" name="Подать жалобу главному судебному приставу субъекта РФ (7 дней после истечения срока рассмотрения предыдущей жалобы)"/>
+    <bpmn:task id="Task_Wait_2" name="Ожидать рассмотрение жалобы главным приставом субъекта РФ"/>
+    <bpmn:exclusiveGateway id="Gateway_Decision_2" name="Есть решение по жалобе?"/>
+
+    <bpmn:task id="Task_3_1" name="Подать жалобу главному судебному приставу РФ (7 дней после истечения срока рассмотрения предыдущей жалобы)"/>
+    <bpmn:task id="Task_Wait_3" name="Ожидать рассмотрение жалобы главным приставом РФ"/>
+    <bpmn:exclusiveGateway id="Gateway_Decision_3" name="Есть решение по жалобе?"/>
+
+    <bpmn:task id="Task_4_1" name="Подать жалобу в прокуратуру (7 дней после истечения срока рассмотрения жалобы главному приставу РФ)"/>
+    <bpmn:task id="Task_4_2" name="Повторно направить обращение СПИ с приложением всех документов"/>
+    <bpmn:exclusiveGateway id="Gateway_SPI_AfterRepeat" name="После повтора СПИ снова бездействует?"/>
+
+    <bpmn:task id="Task_Refusal_1" name="Подать жалобу на постановление СПИ об отказе (при наличии оснований)"/>
+    <bpmn:task id="Task_Refusal_Wait" name="Ожидать рассмотрение жалобы на отказ"/>
+    <bpmn:exclusiveGateway id="Gateway_Refusal_Result" name="Жалоба удовлетворена и права восстановлены?"/>
+
+    <bpmn:endEvent id="EndEvent_Success" name="Процесс завершён (решение получено / права восстановлены)"/>
+
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Gateway_Type"/>
+    <bpmn:sequenceFlow id="Flow_2a" sourceRef="Gateway_Type" targetRef="Task_1_1" name="Бездействие СПИ (нет постановления)"/>
+    <bpmn:sequenceFlow id="Flow_2b" sourceRef="Gateway_Type" targetRef="Task_Refusal_1" name="Постановление СПИ об отказе"/>
+
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Task_1_1" targetRef="Task_Wait_1"/>
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_Wait_1" targetRef="Gateway_Decision_1"/>
+    <bpmn:sequenceFlow id="Flow_5_yes" sourceRef="Gateway_Decision_1" targetRef="EndEvent_Success" name="Да"/>
+    <bpmn:sequenceFlow id="Flow_5_no" sourceRef="Gateway_Decision_1" targetRef="Task_2_1" name="Нет"/>
+
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_2_1" targetRef="Task_Wait_2"/>
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_Wait_2" targetRef="Gateway_Decision_2"/>
+    <bpmn:sequenceFlow id="Flow_8_yes" sourceRef="Gateway_Decision_2" targetRef="EndEvent_Success" name="Да"/>
+    <bpmn:sequenceFlow id="Flow_8_no" sourceRef="Gateway_Decision_2" targetRef="Task_3_1" name="Нет"/>
+
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_3_1" targetRef="Task_Wait_3"/>
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_Wait_3" targetRef="Gateway_Decision_3"/>
+    <bpmn:sequenceFlow id="Flow_11_yes" sourceRef="Gateway_Decision_3" targetRef="EndEvent_Success" name="Да"/>
+    <bpmn:sequenceFlow id="Flow_11_no" sourceRef="Gateway_Decision_3" targetRef="Task_4_1" name="Нет"/>
+
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_4_1" targetRef="Task_4_2"/>
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_4_2" targetRef="Gateway_SPI_AfterRepeat"/>
+    <bpmn:sequenceFlow id="Flow_14_yes" sourceRef="Gateway_SPI_AfterRepeat" targetRef="Task_1_1" name="Да, начать цикл заново"/>
+    <bpmn:sequenceFlow id="Flow_14_no" sourceRef="Gateway_SPI_AfterRepeat" targetRef="EndEvent_Success" name="Нет"/>
+
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_Refusal_1" targetRef="Task_Refusal_Wait"/>
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_Refusal_Wait" targetRef="Gateway_Refusal_Result"/>
+    <bpmn:sequenceFlow id="Flow_17_yes" sourceRef="Gateway_Refusal_Result" targetRef="EndEvent_Success" name="Да"/>
+    <bpmn:sequenceFlow id="Flow_17_no" sourceRef="Gateway_Refusal_Result" targetRef="Task_2_1" name="Нет / бездействие при рассмотрении"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_Obzhalovanie_241">
+      <bpmndi:BPMNShape id="Shape_StartEvent_1" bpmnElement="StartEvent_1">
+        <dc:Bounds x="100" y="220" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Type" bpmnElement="Gateway_Type" isMarkerVisible="true">
+        <dc:Bounds x="180" y="213" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape_Task_1_1" bpmnElement="Task_1_1">
+        <dc:Bounds x="280" y="80" width="290" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Wait_1" bpmnElement="Task_Wait_1">
+        <dc:Bounds x="620" y="80" width="220" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Decision_1" bpmnElement="Gateway_Decision_1" isMarkerVisible="true">
+        <dc:Bounds x="890" y="95" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape_Task_2_1" bpmnElement="Task_2_1">
+        <dc:Bounds x="1010" y="80" width="340" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Wait_2" bpmnElement="Task_Wait_2">
+        <dc:Bounds x="1390" y="80" width="250" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Decision_2" bpmnElement="Gateway_Decision_2" isMarkerVisible="true">
+        <dc:Bounds x="1680" y="95" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape_Task_3_1" bpmnElement="Task_3_1">
+        <dc:Bounds x="1790" y="80" width="340" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Wait_3" bpmnElement="Task_Wait_3">
+        <dc:Bounds x="2160" y="80" width="240" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Decision_3" bpmnElement="Gateway_Decision_3" isMarkerVisible="true">
+        <dc:Bounds x="2430" y="95" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape_Task_4_1" bpmnElement="Task_4_1">
+        <dc:Bounds x="2550" y="80" width="340" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_4_2" bpmnElement="Task_4_2">
+        <dc:Bounds x="2930" y="80" width="320" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_SPI_AfterRepeat" bpmnElement="Gateway_SPI_AfterRepeat" isMarkerVisible="true">
+        <dc:Bounds x="3290" y="95" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape_Task_Refusal_1" bpmnElement="Task_Refusal_1">
+        <dc:Bounds x="280" y="300" width="330" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Refusal_Wait" bpmnElement="Task_Refusal_Wait">
+        <dc:Bounds x="650" y="300" width="250" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Refusal_Result" bpmnElement="Gateway_Refusal_Result" isMarkerVisible="true">
+        <dc:Bounds x="940" y="315" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Shape_EndEvent_Success" bpmnElement="EndEvent_Success">
+        <dc:Bounds x="3520" y="220" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Edge_Flow_1" bpmnElement="Flow_1"><di:waypoint x="136" y="238"/><di:waypoint x="180" y="238"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_2a" bpmnElement="Flow_2a"><di:waypoint x="205" y="213"/><di:waypoint x="205" y="120"/><di:waypoint x="280" y="120"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_2b" bpmnElement="Flow_2b"><di:waypoint x="205" y="263"/><di:waypoint x="205" y="340"/><di:waypoint x="280" y="340"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge_Flow_3" bpmnElement="Flow_3"><di:waypoint x="570" y="120"/><di:waypoint x="620" y="120"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_4" bpmnElement="Flow_4"><di:waypoint x="840" y="120"/><di:waypoint x="890" y="120"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_5_yes" bpmnElement="Flow_5_yes"><di:waypoint x="915" y="145"/><di:waypoint x="915" y="238"/><di:waypoint x="3520" y="238"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_5_no" bpmnElement="Flow_5_no"><di:waypoint x="940" y="120"/><di:waypoint x="1010" y="120"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge_Flow_6" bpmnElement="Flow_6"><di:waypoint x="1350" y="120"/><di:waypoint x="1390" y="120"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_7" bpmnElement="Flow_7"><di:waypoint x="1640" y="120"/><di:waypoint x="1680" y="120"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_8_yes" bpmnElement="Flow_8_yes"><di:waypoint x="1705" y="145"/><di:waypoint x="1705" y="238"/><di:waypoint x="3520" y="238"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_8_no" bpmnElement="Flow_8_no"><di:waypoint x="1730" y="120"/><di:waypoint x="1790" y="120"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge_Flow_9" bpmnElement="Flow_9"><di:waypoint x="2130" y="120"/><di:waypoint x="2160" y="120"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_10" bpmnElement="Flow_10"><di:waypoint x="2400" y="120"/><di:waypoint x="2430" y="120"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_11_yes" bpmnElement="Flow_11_yes"><di:waypoint x="2455" y="145"/><di:waypoint x="2455" y="238"/><di:waypoint x="3520" y="238"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_11_no" bpmnElement="Flow_11_no"><di:waypoint x="2480" y="120"/><di:waypoint x="2550" y="120"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge_Flow_12" bpmnElement="Flow_12"><di:waypoint x="2890" y="120"/><di:waypoint x="2930" y="120"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_13" bpmnElement="Flow_13"><di:waypoint x="3250" y="120"/><di:waypoint x="3290" y="120"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_14_yes" bpmnElement="Flow_14_yes"><di:waypoint x="3315" y="95"/><di:waypoint x="3315" y="40"/><di:waypoint x="425" y="40"/><di:waypoint x="425" y="80"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_14_no" bpmnElement="Flow_14_no"><di:waypoint x="3340" y="120"/><di:waypoint x="3520" y="238"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge_Flow_15" bpmnElement="Flow_15"><di:waypoint x="610" y="340"/><di:waypoint x="650" y="340"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_16" bpmnElement="Flow_16"><di:waypoint x="900" y="340"/><di:waypoint x="940" y="340"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_17_yes" bpmnElement="Flow_17_yes"><di:waypoint x="965" y="315"/><di:waypoint x="965" y="238"/><di:waypoint x="3520" y="238"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_17_no" bpmnElement="Flow_17_no"><di:waypoint x="990" y="340"/><di:waypoint x="1180" y="340"/><di:waypoint x="1180" y="160"/></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
