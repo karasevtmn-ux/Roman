@@ -1,0 +1,3 @@
+notify_email,case_url,court_type,court_name,region,rf_subject,timezone,plaintiff,defendant,court_label,case_number,comment
+karasev.tmn@gmail.com,https://mos-gorsud.ru/rs/kuncevskij/services/cases/civil/details/xxxxx,mos-gorsud,Кунцевский районный суд г. Москвы,Москва,Москва,Europe/Moscow,Фонд ипотечного кредитования,Иванов И.И.,Кунцевский районный суд г. Москвы,02-1234/2026,Тестовая ссылка 1
+karasev.tmn@gmail.com,https://novoilinsky--kmr.sudrf.ru/modules.php?name=sud_delo&...,sudrf,Новоильинский районный суд,Кемеровская область,Кемеровская область,Asia/Krasnoyarsk,Петров П.П.,ООО «Ромашка»,Новоильинский районный суд,2-567/2026,Тестовая ссылка 2
